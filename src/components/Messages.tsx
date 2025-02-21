@@ -1,4 +1,25 @@
 import { useEffect, useState } from "react";
+
+// Extend the Navigator interface to include the 'ai' property
+interface NavigatorAI extends Navigator {
+  ai?: {
+    languageDetector: {
+      create: () => Promise<{
+        detect: (text: string) => Promise<{ detectedLanguage: string }[]>;
+      }>;
+    };
+    translator: {
+      create: (options: {
+        sourceLanguage: string;
+        targetLanguage: string;
+      }) => Promise<{
+        translate: (text: string) => Promise<{ translatedText: string }>;
+      }>;
+    };
+  };
+}
+
+declare const navigator: NavigatorAI;
 import Button from "./Button";
 
 interface MessagesProps {
@@ -26,8 +47,15 @@ const Messages = ({ text }: MessagesProps) => {
       }
 
       try {
-        const detector = await navigator.ai.languageDetector.create();
-        const results = await detector.detect(text);
+        let results;
+        if (navigator.ai && navigator.ai.languageDetector) {
+          const detector = await navigator.ai.languageDetector.create();
+          results = await detector.detect(text);
+        } else {
+          setDetectedLanguage("Unavailable");
+          setError("Language detection is not supported in this browser.");
+          return;
+        }
         if (results.length > 0) {
           setDetectedLanguage(results[0].detectedLanguage);
           setError(null); // Clear errors if successful
