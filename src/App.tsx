@@ -14,9 +14,13 @@ function App() {
   }
 
   function handleSubmit() {
-    setMessages((prevMessages: string[]) => {
-      return [...prevMessages, text];
-    });
+    if (!text) {
+      alert("Text cannot be empty");
+    } else {
+      setMessages((prevMessages: string[]) => {
+        return [...prevMessages, text];
+      });
+    }
     setText("");
   }
 

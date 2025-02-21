@@ -123,7 +123,7 @@ const Messages = ({ text }: MessagesProps) => {
             </select>
           </div>
           <Button
-            className="block cursor-pointer bg-(--primaryColor) p-1 rounded-[10px] text-sm"
+            className="block cursor-pointer bg-(--primaryColor) hover:text-green-600 p-1 rounded-[10px] text-sm"
             onClick={handleTranslation}
           >
             Translate
