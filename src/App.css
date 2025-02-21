@@ -1,13 +1,15 @@
 :root{
-    --primaryColor: #4cb327;
-    /* --primaryColor: #5c5653; */
+    /* --primaryColor: #4cb327; */
+    --primaryColor: #5c5653;
     --secondaryColor: #4f4540;
     --textColor: #e1dbd7;
     --borderColor: #e1dbd7;
 }
 
 
-
+body{
+    background-color: var(--primaryColor);
+}
 
 /* language detector */
 
