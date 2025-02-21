@@ -17,6 +17,7 @@ function App() {
     setMessages((prevMessages: string[]) => {
       return [...prevMessages, text];
     });
+    setText("");
   }
 
   return (
