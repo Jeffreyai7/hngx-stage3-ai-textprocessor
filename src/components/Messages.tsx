@@ -91,14 +91,14 @@ const Messages = ({ text }: MessagesProps) => {
 
   return (
     <div>
-      <div className="text-(--textColor) w-[15rem] md:w-[25rem] bg-(--secondaryColor) rounded-[12px] p-3">
+      <div className="text-(--textColor) w-[18rem] md:w-[25rem] bg-(--secondaryColor) rounded-[12px] p-3">
         <p>{translatedText}</p>
         <small>{`Detected Language: ${detectedLanguage}`}</small>
         {error && <p className="text-red-500 text-sm mt-1">{error}</p>}{" "}
         {/* Display errors */}
         <div className="flex justify-between mt-2">
           <div className="flex items-center gap-1">
-            <label className="block text-sm" htmlFor="language">
+            <label className="block text-[0.5rem]" htmlFor="language">
               Translate to:
             </label>
             <select
