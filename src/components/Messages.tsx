@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
+import Button from "./Button";
 
-// Extend the Navigator interface to include the 'ai' property
+// Extend the Navigator interface to include the AI API
 interface NavigatorAI extends Navigator {
   ai?: {
-    languageDetector: {
+    languageDetector?: {
       create: () => Promise<{
         detect: (text: string) => Promise<{ detectedLanguage: string }[]>;
       }>;
     };
-    translator: {
+    translator?: {
       create: (options: {
         sourceLanguage: string;
         targetLanguage: string;
@@ -20,45 +21,35 @@ interface NavigatorAI extends Navigator {
 }
 
 declare const navigator: NavigatorAI;
-import Button from "./Button";
 
 interface MessagesProps {
   text: string;
 }
 
 const Messages = ({ text }: MessagesProps) => {
-  const [detectedLanguage, setDetectedLanguage] =
-    useState<string>("Detecting...");
-  const [translatedText, setTranslatedText] = useState<string>(text);
-  const [targetLanguage, setTargetLanguage] = useState<string>("fr"); // making the default French
+  const [detectedLanguage, setDetectedLanguage] = useState("Detecting...");
+  const [translatedText, setTranslatedText] = useState(text);
+  const [targetLanguage, setTargetLanguage] = useState("fr"); // Default to French
   const [error, setError] = useState<string | null>(null); // State for error messages
 
-  // Detect Language
   useEffect(() => {
     const detectLanguage = async () => {
-      if (
-        !text ||
-        !("ai" in (navigator as any)) ||
-        !("languageDetector" in (navigator as any).ai)
-      ) {
+      if (!text) return; // If text is empty, don't run detection
+
+      const ai = navigator.ai; // Store AI API reference
+      if (!ai?.languageDetector) {
         setDetectedLanguage("Unavailable");
         setError("Language detection is not supported in this browser.");
         return;
       }
 
       try {
-        let results;
-        if (navigator.ai && navigator.ai.languageDetector) {
-          const detector = await navigator.ai.languageDetector.create();
-          results = await detector.detect(text);
-        } else {
-          setDetectedLanguage("Unavailable");
-          setError("Language detection is not supported in this browser.");
-          return;
-        }
+        const detector = await ai.languageDetector.create();
+        const results = await detector.detect(text);
+
         if (results.length > 0) {
           setDetectedLanguage(results[0].detectedLanguage);
-          setError(null); // Clear errors if successful
+          setError(null); // Clear previous errors
         } else {
           setDetectedLanguage("Unknown");
           setError("Could not detect language.");
@@ -73,15 +64,17 @@ const Messages = ({ text }: MessagesProps) => {
     detectLanguage();
   }, [text]);
 
-  // Translate Text
   const handleTranslation = async () => {
-    if (!("ai" in navigator) || !("translator" in (navigator as any).ai)) {
+    if (!text) return;
+
+    const ai = navigator.ai; // Store AI API reference
+    if (!ai?.translator) {
       setError("Translation API is not supported in this browser.");
       return;
     }
 
     try {
-      const translator = await (navigator as any).ai.translator.create({
+      const translator = await ai.translator.create({
         sourceLanguage: detectedLanguage, // Auto-detected source
         targetLanguage: targetLanguage, // User-selected language
       });
@@ -91,7 +84,7 @@ const Messages = ({ text }: MessagesProps) => {
       setError(null); // Clear errors if successful
     } catch (err) {
       console.error("Translation error:", err);
-      setTranslatedText(text); // Keep original text
+      setTranslatedText("Translation unavailable.");
       setError("Translation failed. Please try again.");
     }
   };
